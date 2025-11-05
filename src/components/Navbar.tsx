@@ -1,12 +1,24 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Phone, Mail } from "lucide-react";
+import { Menu, X, Phone, Mail, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.jpg";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [points, setPoints] = useState(0);
   const location = useLocation();
+
+  useEffect(() => {
+    const updatePoints = () => {
+      const savedPoints = localStorage.getItem("testPoints");
+      setPoints(savedPoints ? parseInt(savedPoints) : 0);
+    };
+
+    updatePoints();
+    window.addEventListener("storage", updatePoints);
+    return () => window.removeEventListener("storage", updatePoints);
+  }, []);
 
   const navLinks = [
     { name: "Home", path: "/" },
@@ -17,6 +29,7 @@ const Navbar = () => {
     { name: "Campus", path: "/campus" },
     { name: "Routine", path: "/routine" },
     { name: "Reviews", path: "/reviews" },
+    { name: "Test", path: "/test" },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -69,6 +82,10 @@ const Navbar = () => {
                 {link.name}
               </Link>
             ))}
+            <div className="flex items-center gap-2 ml-2 px-3 py-1.5 bg-gradient-to-r from-primary to-secondary text-white rounded-md">
+              <Trophy className="h-4 w-4" />
+              <span className="font-semibold">{points}</span>
+            </div>
             <Link to="/admin">
               <Button variant="outline" size="sm" className="ml-2">
                 Admin
@@ -89,6 +106,10 @@ const Navbar = () => {
         {isOpen && (
           <div className="lg:hidden py-4 animate-fade-in">
             <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-center gap-2 mb-2 px-4 py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-md">
+                <Trophy className="h-5 w-5" />
+                <span className="font-semibold">Points: {points}</span>
+              </div>
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
