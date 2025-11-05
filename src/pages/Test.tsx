@@ -35,15 +35,23 @@ const Test = () => {
   };
 
   const generateWordQuestion = () => {
-    const words = generate({ exactly: 4, maxLength: 8 }) as string[];
-    const correctWord = words[Math.floor(Math.random() * words.length)];
-    const wrongWord = correctWord.split("").sort(() => Math.random() - 0.5).join("");
+    const words = generate({ exactly: 1, maxLength: 8 }) as string[];
+    const correctWord = words[0];
     
-    const options = words.map(w => 
-      w === correctWord ? wrongWord : w
-    ).sort(() => Math.random() - 0.5);
+    // Create 3 scrambled/wrong versions of the correct word
+    const wrongWords = [];
+    for (let i = 0; i < 3; i++) {
+      let scrambled;
+      do {
+        scrambled = correctWord.split("").sort(() => Math.random() - 0.5).join("");
+      } while (scrambled === correctWord || wrongWords.includes(scrambled));
+      wrongWords.push(scrambled);
+    }
     
-    setWordQuestion({ correct: correctWord, wrong: wrongWord, options });
+    // Combine correct word with 3 wrong words and shuffle
+    const options = [correctWord, ...wrongWords].sort(() => Math.random() - 0.5);
+    
+    setWordQuestion({ correct: correctWord, wrong: wrongWords[0], options });
     setSelectedWord("");
   };
 
